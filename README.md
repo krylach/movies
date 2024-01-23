@@ -18,7 +18,26 @@ composer install
 ### Setting database in configs
 ##### \configs\database.php (```https://github.com/krylach/movies/blob/main/configs/database.php```)
 
-### Run application
+### !!! If run on unix:
+#### create next dirs in the project dir:
+
+```bash 
+mkdir -m 755 tmp/
+```
+```bash 
+mkdir -m 755 tmp/compile
+```
+```bash 
+mkdir -m 755 tmp/cache
+```
+```bash 
+mkdir -m 755 tmp/config
+```
+
+
+#
+
+### Run application in the project dir:
 ```bash 
 php -S localhost:9000
 ```

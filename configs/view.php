@@ -9,7 +9,7 @@ return [
     'debugging' => false,
     'minify' => true,
     'cache' => [
-        'enable' => false,
+        'enable' => true,
         'life_time' => 86400,
     ]
 ];
