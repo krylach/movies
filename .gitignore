@@ -1,0 +1,6 @@
+/tmp/cache
+/tmp/compile
+/tmp/config
+/tmp/uploaded
+/vendor/
+composer.lock
