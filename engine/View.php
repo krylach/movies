@@ -36,6 +36,18 @@ class View extends \Smarty
         }
     }
 
+    public static function flushCache($template = null)
+    {
+        $self = new static;
+        
+        if ($template) {
+            $template = $self->replaceTemplateName($template);
+            $self->clearCache("views/{$template}.{$self->config->suffix_template}.tpl");
+        } else {
+            $self->clearAllCache();
+        }
+    }
+
     public function multipleAssign(array $data)
     {
         foreach ($data as $key => $value) {
@@ -45,10 +57,16 @@ class View extends \Smarty
         return $this;
     }
 
-    public function setTemplate(string $template)
+    public function replaceTemplateName(string $template)
     {
         $templateSegments = explode('.', $template);
-        $this->template = implode('/', $templateSegments);
+
+        return implode('/', $templateSegments);
+    }
+
+    public function setTemplate(string $template)
+    {
+        $this->template = $this->replaceTemplateName($template);
 
         return $this;
     }

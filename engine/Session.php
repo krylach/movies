@@ -8,8 +8,10 @@ class Session
     {
         $config = config('session');
 
-        session_name($config->name);
-        session_cache_expire($config->expire);
+        if (session_status() === PHP_SESSION_NONE) {
+            session_name($config->name);
+            session_cache_expire($config->expire);
+        }
     }
 
     public static function __callStatic($name, $parameters)
@@ -37,7 +39,7 @@ class Session
     {
         $value = Session::get($name);
 
-        if ($value || isset($_SESSION[$name])) {
+        if ($value) {
             Session::delete($name);
         }
 

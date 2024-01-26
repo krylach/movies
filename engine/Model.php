@@ -71,7 +71,7 @@ class Model extends Database {
             new \Miner(
                 $model->getPdoConnect()
             );
-        
+
         return $model->miner->delete()
             ->from($this->table)
             ->where('id', $this->id)
