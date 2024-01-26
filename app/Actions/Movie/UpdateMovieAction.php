@@ -2,13 +2,17 @@
 
 namespace App\Actions\Movie;
 
+use App\Actions\Traits\HasPrepared;
 use App\Models\Movie;
 use App\Models\MovieStars;
+use Engine\Session;
 use Progsmile\Validator\Validator;
 use Symfony\Component\HttpFoundation\Request;
 
 class UpdateMovieAction
 {
+    use HasPrepared;
+
     private Movie $movie;
     private Request $request;
 
@@ -20,8 +24,13 @@ class UpdateMovieAction
 
     public function execute()
     {
-        if ($this->validation()) {
-            $data = $this->request->request->all();
+        $data = $this->preparation(
+            $this->request->request->all()
+        );
+
+        $validate = $this->validation($data);
+
+        if (!$validate->isFail()) {
             $starsFromRequest = $data['stars'];
             unset($data['stars']);
 
@@ -35,25 +44,17 @@ class UpdateMovieAction
                     MovieStars::create(['star_id' => $starId, 'movie_id' => $this->movie->id]);
                 }
             }
+
+            Session::set("success", "A movie with the title <b>\"{$this->movie->title}\"</b> was successfully updated");
         }
 
         return redirect("/admin/movie/{$this->movie->id}/edit");
     }
 
-    private function validation()
+    public function validation($data)
     {
-        $rules = [
-            'title' => ['required'],
-            'release_year' => ['required', 'numeric', 'between:1900, 2024'],
-            'format_id' => ['required', 'numeric'],
-            'stars' => [],
-        ];
+        $validationCreateMovie = new ValidationMovie;
 
-        $validator = Validator::make(
-            $this->request->request->all(),
-            $rules,
-        );
-
-        return !$validator->fails();
+        return $validationCreateMovie->execute($data);
     }
 }

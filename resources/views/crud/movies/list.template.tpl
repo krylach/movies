@@ -4,6 +4,11 @@
          <div class="card-body">
             <div class="card-title">
                <h6 class="mr-2"><span>{$title}</span></h6>
+               {if $success}
+                <div class="alert alert-success" role="alert">
+                    {$success}
+                </div>
+                {/if}
             </div>
             <div class="e-table">
                <div class="table-responsive table-lg mt-3">
@@ -28,7 +33,7 @@
                                     <td class="text-center align-middle">
                                         <div class="btn-group align-top">
                                             <a href="/admin/movie/{$movie->id}/edit" class="btn btn-sm btn-outline-secondary badge">Edit</a>
-                                            <form method="post" action="/admin/movie/{$movie->id}/delete" class="btn btn-sm btn-outline-secondary badge">
+                                            <form method="post" action="/admin/movie/{$movie->id}/delete" class="btn btn-sm btn-outline-secondary badge delete-movie">
                                                 <button class="btn btn-sm btn-outline-secondary badge" style="border:0;" type="submit"><i class="fa fa-trash"></i></button>
                                             </form>
                                         </div>

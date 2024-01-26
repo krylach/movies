@@ -58,9 +58,11 @@ if (!function_exists('to_object')) {
 }
 
 if (!function_exists('redirect')) {
-    function redirect($url)
+    function redirect($url, $status = 302)
     {
-        return header("Location: $url");
+        http_response_code($status);
+
+        return header("Location: $url", false);
     }
 }
 

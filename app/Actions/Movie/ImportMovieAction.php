@@ -6,6 +6,7 @@ use App\Models\Movie;
 use App\Models\MovieFormat;
 use App\Models\MovieStars;
 use App\Models\Star;
+use Engine\Session;
 use Symfony\Component\HttpFoundation\Request;
 
 class ImportMovieAction
@@ -37,7 +38,11 @@ class ImportMovieAction
 
     private function createMovies($movies)
     {
+        $updated = 0;
+        $created = 0;
+
         foreach ($movies as $movie) {
+            
             $stars = $movie['stars'];
             unset($movie['stars']);
 
@@ -45,7 +50,14 @@ class ImportMovieAction
             unset($movie['format']);
             $movie['format_id'] = $format->id;
 
-            $movieModel = Movie::create($movie);
+            $movieModel = Movie::where('title', $movie['title'])->first();
+            if (!$movieModel)  {
+                $movieModel = Movie::create($movie); 
+                $created++;
+            } else {
+                $movieModel->update($movie);
+                $updated++;
+            }
 
             foreach ($stars as $star) {
                 $starModel = Star::where('name', $star)->first();
@@ -56,6 +68,8 @@ class ImportMovieAction
                 MovieStars::create(['star_id' => $starModel->id, 'movie_id' => $movieModel->id]);
             }
         }
+
+        Session::set('success', "$updated films updated, $created films created");
     }
 
     private function collectMovies($fileName)

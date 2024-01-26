@@ -21,6 +21,7 @@ class Application
 
     public function __destruct()
     {
+        session_commit();
         session_abort();
     }
 }

@@ -4,22 +4,53 @@ namespace Engine;
 
 class Session
 {
-    public static function set($name, $value)
+    public function __construct()
     {
-        $_SESSION[$name] = $value;
-        session_commit();
+        $config = config('session');
 
-        return $_SESSION[$name];
+        session_name($config->name);
+        session_cache_expire($config->expire);
     }
 
-    public static function get($name)
+    public static function __callStatic($name, $parameters)
+    {
+        return call_user_func_array([new static, $name], $parameters);
+    }
+
+    private function put($name, $values)
+    {
+        if (is_array($values)) {
+            foreach ($values as $key => $value) {
+                $_SESSION[$name][$key] = $value;
+            }
+        } else {
+            $_SESSION[$name][] = $values;
+        }
+    }
+
+    private function set($name, $value)
+    {
+        $_SESSION[$name] = $value;
+    }
+
+    private function getAndDelete($name)
+    {
+        $value = Session::get($name);
+
+        if ($value || isset($_SESSION[$name])) {
+            Session::delete($name);
+        }
+
+        return $value;
+    }
+
+    private function get($name)
     {
         return $_SESSION[$name] ?? null;
     }
 
-    public static function delete($name)
+    private function delete($name)
     {
         unset($_SESSION[$name]);
-        session_commit();
     }
 }

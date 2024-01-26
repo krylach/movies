@@ -2,13 +2,18 @@
 
 namespace App\Actions\Movie;
 
+use App\Actions\Traits\HasPrepared;
 use App\Models\Movie;
 use App\Models\MovieStars;
+use App\Rules\IsNotEmpty;
+use Engine\Session;
 use Progsmile\Validator\Validator;
 use Symfony\Component\HttpFoundation\Request;
 
 class CreateMovieAction
 {
+    use HasPrepared;
+
     private Request $request;
 
     public function __construct(Request $request)
@@ -18,36 +23,36 @@ class CreateMovieAction
 
     public function execute()
     {
-        if ($this->validation()) {
-            $data = $this->request->request->all();
+        $data = $this->preparation(
+            $this->request->request->all()
+        );
+
+        $validate = $this->validation($data);
+
+        if (!$validate->isFail()) {
             $stars = $data['stars'];
             unset($data['stars']);
 
             $movie = Movie::create($data);
+
             if ($movie && $stars) {
                 foreach ($stars as $starId) {
                     MovieStars::create(['star_id' => $starId, 'movie_id' => $movie->id]);
                 }
+            }
+
+            if ($movie) {
+                Session::set("success", "A movie with the title <b>\"{$movie->title}\"</b> was successfully added");
             }
         }
 
         return redirect('/admin/movies');
     }
 
-    public function validation()
+    public function validation($data)
     {
-        $rules = [
-            'title' => ['required'],
-            'release_year' => ['required', 'numeric', 'between:1900, 2024'],
-            'format_id' => ['required', 'numeric'],
-            'stars' => [],
-        ];
+        $validationCreateMovie = new ValidationMovie;
 
-        $validator = Validator::make(
-            $this->request->request->all(),
-            $rules,
-        );
-
-        return !$validator->fails();
+        return $validationCreateMovie->execute($data);
     }
 }

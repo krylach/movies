@@ -9,6 +9,7 @@ use App\Actions\Movie\UpdateMovieAction;
 use App\Models\Movie;
 use App\Models\MovieFormat;
 use App\Models\Star;
+use Engine\Session;
 use Symfony\Component\HttpFoundation\Request;
 
 class MovieController
@@ -24,6 +25,8 @@ class MovieController
                 'stars'     => $this->buildStars(),
                 'request' => $request,
                 'title' => 'Movies',
+                'errors' => Session::getAndDelete('errors'),
+                'success' => Session::getAndDelete('success'),
                 'filter' => !empty($parameters) ? $parameters : [
                     'title' => '',
                     'star' => '',
@@ -41,6 +44,8 @@ class MovieController
             ->multipleAssign([
                 'title' => $movie->title ?? '' . " edit",
                 'movie' => $movie,
+                'errors' => Session::getAndDelete('errors'),
+                'success' => Session::getAndDelete('success'),
                 'formats'   => $this->buildFormats(),
                 'stars'     => $this->buildStars(),
             ])
@@ -49,6 +54,7 @@ class MovieController
 
     public function delete(Movie $movie)
     {
+        Session::set("success", "A movie with the title <b>\"{$movie->title}\"</b> was successfully deleted");
         $movie->delete();
 
         return redirect('/admin/movies');

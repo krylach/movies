@@ -18,7 +18,7 @@ class BuildMoviesAction
 
     public function execute()
     {
-        $builder = Movie::where('id', null, 'is not');
+        $builder = Movie::query();
 
         if ($sort = $this->request->query->get('sort')) {
             $builder->orderBy('title', $sort);
